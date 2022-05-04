@@ -3,7 +3,7 @@ from aiogram import executor
 from database import create_db
 from bot_create import dp
 from bot_create import bot
-from admin import admin_chat_id
+from admin import *
 
 
 async def on_startup(_):
@@ -14,7 +14,6 @@ async def on_startup(_):
 
 
 from handlers import *
-from admin import *
 
 
 main_handlers.register_user_handlers(dp)

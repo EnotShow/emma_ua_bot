@@ -6,6 +6,7 @@ from aiogram.types import ReplyKeyboardRemove
 
 from bot_create import bot
 from database import *
+from database import _user_selector_algorith
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import *
@@ -64,26 +65,27 @@ async def make_chose(message: types.Message, state: FSMContext):
         try:
             # Знайомитись
             if message.text == b1.text:
-
                 await state.finish()
                 await FSMFind.user.set()
-                async with state.proxy() as data:
-                    related_users = get_related_users(message.from_user.id)
-                    if len(related_users) == 1:
-                        related_users = related_users[0]
-                        user_questionnaire = related_users
-                    else:
-                        user_questionnaire = random.choice(related_users)
-                        related_users.remove(user_questionnaire)
-
-                    data['userlist'] = related_users
-                    data['user'] = user_questionnaire.user_id
-
-                    await bot.send_photo(
-                        message.from_user.id,
-                        user_questionnaire.photo,
-                        caption=f'{user_questionnaire.about}',
-                        reply_markup=fbuttons)
+                # -------------
+                user_questionnaire = await _user_selector_algorith(
+                    message.from_user.id,
+                    get_related_users(message.from_user.id),
+                    state
+                )
+                # related_users = get_related_users(message.from_user.id)
+                # if len(related_users) == 1:
+                #     related_users = related_users[0]
+                # user_questionnaire = random.choice(related_users)
+                # async with state.proxy() as data:
+                #     data['userlist'] = related_users.remove(user_questionnaire)
+                #     data['user'] = user_questionnaire.user_id
+                # # ------------
+                await bot.send_photo(
+                    message.from_user.id,
+                    user_questionnaire.photo,
+                    caption=f'{user_questionnaire.about}',
+                    reply_markup=fbuttons)
         except IndexError:
             await bot.send_message(message.from_user.id, f'{tmain5}')
             await state.finish()

@@ -1,3 +1,5 @@
+import random
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -51,17 +53,28 @@ def edit_questionnaire(user_id, username, name, age, photo_id, about, sex_id, ci
         session.commit()
 
 
-def get_related_users(user_id):
+def get_related_users(user_id, region_key=True):
     with Session(engine) as session:
         questionnaire = get_user_questionnaire(user_id)
         city = questionnaire.city
         to_find = questionnaire.find
-        stmt = select(Questionnaire).where(
-            Questionnaire.sex == to_find,
-            Questionnaire.city == city,
-            Questionnaire.is_delete == False,
-            Questionnaire.is_banned == False
-        )
+        if region_key:
+            stmt = select(Questionnaire).where(
+                # Questionnaire.user_id != user_id,
+                Questionnaire.sex == to_find,
+                Questionnaire.city == city,
+                Questionnaire.is_delete == False,
+                Questionnaire.is_banned == False
+            )
+        else:
+            stmt = select(Questionnaire).where(
+                # Questionnaire.user_id != user_id,
+                Questionnaire.sex == to_find,
+                Questionnaire.city != city,
+                Questionnaire.is_delete == False,
+                Questionnaire.is_banned == False
+            )
+
         related_users = engine.connect().execute(stmt).fetchall()
         return related_users
 
@@ -175,3 +188,17 @@ def city_filter(message_text):
     for i in city_list:
         if i == message_text:
             return True
+
+
+# async def _user_selector_algorith(user_id, method, state):
+#     async with state.proxy as data:
+#         related_users = method
+#         if len(related_users) == 1:
+#             related_users = related_users[0]
+#             user_questionnaire = related_users
+#             data['userlist'] = get_related_users(user_id, region_key=False)
+#         else:
+#             user_questionnaire = random.choice(related_users)
+#             data['userlist'] = related_users.remove(user_questionnaire)
+#         data['user'] = user_questionnaire.user_id
+#         return user_questionnaire

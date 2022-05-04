@@ -5,3 +5,4 @@ class FSMFind(StatesGroup):
     user = State()
     message = State()
     username = State()
+    userlist = State()

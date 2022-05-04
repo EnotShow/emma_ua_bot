@@ -1,56 +1,69 @@
-from aiogram import Dispatcher, types
-from aiogram.types import ReplyKeyboardRemove
-from aiogram.dispatcher import FSMContext
 import random
 
+from aiogram import Dispatcher, types
+from aiogram.dispatcher import FSMContext
+from aiogram.types import ReplyKeyboardRemove
+
 from bot_create import bot
-from keyboards import *
 from database import *
+from language.ua.keyboards import *
+from language.ua.text import *
 from states import *
 
 
 async def send_welcome(message: types.Message):
     try:
         is_register = is_registered(message.from_user.id)
+        # Проверяет забаненый ли пользователь
         if is_banned(message.from_user.id):
             await bot.send_message(
                 message.from_user.id,
-                'Ви заблоковані. Це рішення не підглядає оскарженню.',
+                f'{tmain1}',
                 reply_markup=ReplyKeyboardRemove()
             )
             await FSMBan.status.set()
         else:
+            # Если пользовтель удалил свою анкету
             if is_register.is_delete:
                 await FSMDelete.recover.set()
                 await bot.send_message(
                     message.from_user.id,
-                    'Раді бачити вас знову. Бажаєте відновити вашу анкету?',
+                    f'{tmain2}',
                     reply_markup=recovery_questionnaire_keyboard
                 )
+            # Пользователь зарегистрирован
             elif not is_register.is_delete:
                 await bot.send_message(
                     message.from_user.id,
-                    "Привіт, що тебе цікавить сьогодні?",
+                    f'{tmain3}',
                     reply_markup=main_manu_buttons
                 )
                 await FSMMenu.status.set()
     except:
+        # У пользователя нет анкеты
         await FSMRegister.age.set()
         await bot.send_message(
             message.from_user.id,
-            'Хелоу! Давай спершу зареєструєм твою анкету.\n\n'
-            'Cкільки землю топчеш?',
+            f'{tmain8}',
         )
     await message.delete()
 
 
 async def make_chose(message: types.Message, state: FSMContext):
+    if not check_username(message.from_user.id):
+        await bot.send_message(message.from_user.id, f'{no_username}')
+
+    # if return_to_main_manu(message.text):
+    #     await send_welcome(message.text)
+    # else:
+    # Проверяет забаненый ли пользователь
     if is_banned(message.from_user.id):
-        await bot.send_message(message.from_user.id, 'Ви заблоковані. Це рішення не підглядає оскарженню.')
+        await bot.send_message(message.from_user.id, f'{tmain1}')
         await FSMBan.status.set()
     else:
         try:
-            if message.text == 'Знайомитись ☘️':
+            # Знайомитись
+            if message.text == b1.text:
                 await state.finish()
                 await FSMFind.user.set()
                 related_users = get_related_users(message.from_user.id)
@@ -63,11 +76,12 @@ async def make_chose(message: types.Message, state: FSMContext):
                     caption=f'{user_questionnaire.about}',
                     reply_markup=fbuttons)
         except IndexError:
-            await bot.send_message(message.from_user.id, 'Поки що немає користувачів які підходять вам')
+            await bot.send_message(message.from_user.id, f'{tmain5}')
             await state.finish()
             await FSMMenu.status.set()
 
-    if message.text == 'Кому я сподобався':
+    # Кому я сподобався
+    if message.text == b2.text:
         try:
             await state.finish()
             await FSMWatchList.user.set()
@@ -88,7 +102,7 @@ async def make_chose(message: types.Message, state: FSMContext):
                         message.from_user.id,
                         questionnaire.photo,
                         caption=f'{questionnaire.about}'
-                                f'\n\nОн оставил сообщенния:\n{user_message}',
+                                f'{tedit6}\n{user_message}',
                         reply_markup=wlbutton
                     )
         except:
@@ -96,27 +110,27 @@ async def make_chose(message: types.Message, state: FSMContext):
             await FSMMenu.status.set()
             await bot.send_message(
                 message.from_user.id,
-                "У вас поки що немає симпатій, ми сповістим вас як тільки вони з'являться"
+                f"{tmain7}"
             )
-
-    if message.text == 'Редагувати мою анкету':
+    # Редагувати мою анкету
+    if message.text == b3.text:
         await state.finish()
-        await bot.send_message(message.from_user.id, 'Скільки тобі років?')
-        await FSMEdit.age.set()
+        await FSMPreEdit.state_one.set()
+        await bot.send_message(message.from_user.id, f'{tfind5}', reply_markup=editk1)
 
-    if message.text == 'Видалити мою анкету':
+    # Видалити мою анкету
+    if message.text == b4.text:
         await state.finish()
         await FSMDelete.status.set()
-        delete_questionnaire(message.from_user.id)
         await bot.send_message(
             message.from_user.id,
-            'Ви справді бажаєте видалити вашу анкету?',
+            f'{tmain9}',
             reply_markup=confirmation_button
         )
 
 
 async def ban(message: types.Message):
-    await bot.send_message(message.from_user.id, 'Ви заблоковані, це рішення не підглядає оскарженню.')
+    await bot.send_message(message.from_user.id, f'{tmain1}')
 
 
 def register_user_handlers(dp: Dispatcher):

@@ -1,5 +1,4 @@
 from aiogram import types, Dispatcher
-import string
 
 from aiogram.dispatcher import filters
 
@@ -10,6 +9,9 @@ from .admin_features import ban
 async def ban_user(callback_query: types.CallbackQuery):
     if callback_query.data == 'nothing':
         pass
+    # elif callback_query.data == 'Отправить сообщения':
+    #     user = callback_query.data.lstrip('message:')
+    #     await FSM
     else:
         data = callback_query.data
         ban(data.lstrip('ban data:'))

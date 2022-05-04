@@ -1,5 +1,7 @@
-from keyboards import recovery_questionnaire_keyboard
-from states import FSMDelete, FSMEdit
+from language.ua import recovery_questionnaire_keyboard, main_manu_buttons
+from language.ua.keyboards import *
+from language.ua.text import *
+from states import FSMDelete, FSMEdit, FSMMenu
 from bot_create import bot
 from database import delete_questionnaire
 
@@ -9,28 +11,25 @@ from aiogram.dispatcher import FSMContext
 
 
 async def delete_user_questionnaire(message: types.Message, state: FSMContext):
-    if message.text == 'Так':
+    if message.text == allow_button.text:
         delete_questionnaire(message.from_user.id)
         await state.finish()
         await FSMDelete.recover.set()
-        await bot.send_message(message.from_user.id, 'Анкета видалена! Сподіваюсь ми вам допомогли.'
-                                                     ' Ви можете відновити свою анкету у будь-який час.',
-                               reply_markup=recovery_questionnaire_keyboard)
-
-    elif message.text == 'Ні':
+        await bot.send_message(message.from_user.id, f'{tdelet1}', reply_markup=recovery_questionnaire_keyboard)
+    elif message.text == cancel_button.text:
         await state.finish()
-        await FSMDelete.recover.set()
+        await FSMMenu.status.set()
         await bot.send_message(
             message.from_user.id,
-            'Ми будемо вас чекати',
-            reply_markup=recovery_questionnaire_keyboard
+            f'{tfind5}',
+            reply_markup=main_manu_buttons
         )
 
 
 async def recover(message: types.Message, state: FSMContext):
     await state.finish()
     await FSMEdit.age.set()
-    await bot.send_message(message.from_user.id, 'Cкільки тобі років?', reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(message.from_user.id, f'{tdelet2}', reply_markup=ReplyKeyboardRemove())
 
 
 def register_user_handlers(dp: Dispatcher):

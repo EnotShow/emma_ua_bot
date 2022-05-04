@@ -1,7 +1,10 @@
 from sqlalchemy import create_engine, Column, ForeignKey, Integer, Boolean, String, MetaData
 from sqlalchemy.orm import declarative_base, relationship, Session, sessionmaker
+import os
+
 
 engine = create_engine(f"sqlite:///sqlitedb")  # echo=True
+
 Base = declarative_base()
 meta = MetaData(engine)
 DBSession = sessionmaker(bind=engine)
@@ -13,6 +16,8 @@ class Questionnaire(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     user_id = Column(Integer, unique=True)
     username = Column(String(30))
+    name = Column(String(30))
+    age = Column(Integer)
     photo = Column(String(100))
     about = Column(String(500))
     sex = Column(Integer)

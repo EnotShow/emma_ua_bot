@@ -19,3 +19,4 @@ sqlitedb
 states/__pycache__/quistennaire_find_state.cpython-310.pyc
 handlers/__pycache__/quistennaire_find_handler.cpython-310.pyc
 handlers/__pycache__/main_handlers.cpython-310.pyc
+*.pyc

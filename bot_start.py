@@ -15,14 +15,13 @@ async def on_startup(_):
 
 from handlers import *
 
-
+admin_features.register_admin_handlers(dp)
 main_handlers.register_user_handlers(dp)
 edit_handler.register_user_handlers(dp)
 quistennaire_find_handler.register_user_handlers(dp)
 watch_like_list.register_user_handlers(dp)
 delete_questionnaire_handler.register_user_handlers(dp)
 inline_reply_handlers.register_admin_handlers(dp)
-admin_features.register_admin_handlers(dp)
 test_handlers.register_user_handlers(dp)
 
 if __name__ == '__main__':

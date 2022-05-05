@@ -67,19 +67,8 @@ async def stop_bot(message: types.Message):
         return quit()
 
 
-async def reload(message: types.Message):
-    if message.get_args() == int(message.get_args()):
-        button = InlineKeyboardButton('Перезапустити бота')
-
-
-# async def get_chat_id(message: types.Message):
-#     await bot.send_message(message.chat.id, f'{message.chat.id}')
-
-
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(announcement, commands=['announcement'])
     dp.register_message_handler(message_to_user, commands=['message'])
     dp.register_message_handler(send_registered_user_count, commands=['users'])
-    dp.register_message_handler(reload, commands=['reload'])
     dp.register_message_handler(stop_bot, commands=['stop_bot'])
-    # dp.register_message_handler(get_chat_id, commands=['chat'])

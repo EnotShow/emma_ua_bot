@@ -5,10 +5,9 @@ mainb = KeyboardButton('Головне меню')
 b1 = KeyboardButton('Знайомитись ☘️')
 b2 = KeyboardButton('Кому я сподобався')
 b3 = KeyboardButton('Моя анкета')
-b4 = KeyboardButton('Видалити мою анкету')
 
 main_manu_buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-main_manu_buttons.add(b1).insert(b2).add(b3).insert(b4)
+main_manu_buttons.add(b1).insert(b2).add(b3)
 
 # register/edit buttons
 
@@ -26,9 +25,10 @@ sexb2.add(mb2).insert(fb2)
 
 editb1 = KeyboardButton('Переглянути мою анкету')
 editb2 = KeyboardButton('Редагувати мою анкету')
+b4 = KeyboardButton('Видалити мою анкету')
 
 editk1 = ReplyKeyboardMarkup(resize_keyboard=True)
-editk1.add(editb1).insert(editb2).add(mainb)
+editk1.add(editb1).insert(editb2).add(b4).add(mainb)
 
 editb3 = KeyboardButton('Заповнити анкету заново')
 editb4 = KeyboardButton('Змінити фото')
@@ -75,4 +75,5 @@ cancel_button = KeyboardButton('Ні')
 confirmation_button = ReplyKeyboardMarkup(resize_keyboard=True)
 confirmation_button.add(allow_button).insert(cancel_button)
 
-recovery_questionnaire_keyboard = ReplyKeyboardMarkup(resize_keyboard=True).add(KeyboardButton('Відновити анкету'))
+recoverb = KeyboardButton('Відновити анкету')
+recovery_questionnaire_keyboard = ReplyKeyboardMarkup(resize_keyboard=True).add(recoverb)

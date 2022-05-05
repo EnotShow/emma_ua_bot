@@ -49,6 +49,8 @@ async def next_find_questionnaire(message: types.Message, state: FSMContext):
 
                 if message.text == complain.text:
                     await bot.send_message(message.from_user.id, f'{tfind4}')
+                    async with state.proxy() as data:
+                        await send_report(data["user"], message.from_user.username)
 
                 try:
                     related_users = data['userlist']
@@ -122,6 +124,7 @@ async def get_message(message: types.Message, state: FSMContext):
         except:
             await state.finish()
             await bot.send_message(message.from_user.id, f'{tfind8}', reply_markup=main_manu_buttons)
+
 
 def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(next_find_questionnaire, state=FSMFind.user)

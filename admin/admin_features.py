@@ -19,6 +19,20 @@ def ban(user_id):
     session.commit()
 
 
+async def message_to_deleted_users(message: types.Message):
+    if message.chat.id == admin_chat_id:
+        message_to_send = message.get_args()
+        stmt = select(Questionnaire).where(Questionnaire.is_delete == True, Questionnaire.is_banned == False)
+        result = engine.connect().execute(stmt).fetchall()
+        await bot.delete_message(message.chat.id, message.message_id)
+        for user in result:
+            try:
+                await bot.send_message(user.user_id, message_to_send)
+            except:
+                pass
+        await bot.send_message(message.chat.id, 'Сообщения доставлены')
+
+
 async def message_to_user(message: types.Message):
     if message.chat.id == admin_chat_id:
         try:
@@ -67,15 +81,9 @@ async def stop_bot(message: types.Message):
         return quit()
 
 
-# async def forward(message: types.Message):
-#     if message.chat.id == admin_chat_id:
-#         # await bot.send_message(message.chat.id, message.reply_to_message.message_id)
-#         await bot.forward_message(message.from_user.id, message.chat.id, message.reply_to_message.message_id)
-
-
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(announcement, commands=['announcement'])
     dp.register_message_handler(message_to_user, commands=['message'])
+    dp.register_message_handler(message_to_deleted_users, commands=['to_deleted'])
     dp.register_message_handler(send_registered_user_count, commands=['users'])
-    # dp.register_message_handler(forward, commands=['forward'])
     dp.register_message_handler(stop_bot, commands=['stop_bot'])

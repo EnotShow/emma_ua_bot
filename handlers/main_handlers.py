@@ -27,7 +27,6 @@ async def send_welcome(message: types.Message):
         else:
             # Если пользовтель удалил свою анкету
             if is_register.is_delete:
-                await FSMDelete.recover.set()
                 await bot.send_message(
                     message.from_user.id,
                     f'{tmain2}',

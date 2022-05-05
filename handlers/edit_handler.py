@@ -190,10 +190,11 @@ async def photo_edit(message: types.Message, state: FSMContext):
 
 
 async def about_edit(message: types.Message, state: FSMContext):
-    if message.text == '/start':
-        await state.finish()
-        await send_welcome(message)
-    else:
+    if message.content_type == ContentType.TEXT:
+        if message.text == '/start':
+            await state.finish()
+            await send_welcome(message)
+    elif message.content_type == ContentType.PHOTO:
         questionnaire = get_user_questionnaire(message.from_user.id)
         with Session(engine) as session:
             questionnaire.about = user_questionnaire_template(
@@ -223,7 +224,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(user_register.get_city, state=FSMRegister.city)
     dp.register_message_handler(user_register.get_find, state=FSMRegister.find)
     dp.register_message_handler(user_register.get_about, state=FSMRegister.about)
-    dp.register_message_handler(user_register.get_photo, state=FSMRegister.photo)
+    dp.register_message_handler(user_register.get_photo, state=FSMRegister.photo, content_types=['photo', 'text'])
 
     # User edit
     dp.register_message_handler(user_edit.get_age, state=FSMEdit.age)
@@ -232,8 +233,8 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(user_edit.get_city, state=FSMEdit.city)
     dp.register_message_handler(user_edit.get_find, state=FSMEdit.find)
     dp.register_message_handler(user_edit.get_about, state=FSMEdit.about)
-    dp.register_message_handler(user_edit.get_photo, state=FSMEdit.photo)
+    dp.register_message_handler(user_edit.get_photo, state=FSMEdit.photo, content_types=['photo', 'text'])
 
     # Select edit
-    dp.register_message_handler(photo_edit, state=FSMPhotoEdit)
+    dp.register_message_handler(photo_edit, state=FSMPhotoEdit, content_types=['photo', 'text'])
     dp.register_message_handler(about_edit, state=FSMAboutEdit.about)

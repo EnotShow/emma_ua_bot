@@ -13,10 +13,8 @@ from aiogram.types import ReplyKeyboardRemove
 
 async def delete_user_questionnaire(message: types.Message, state: FSMContext):
     if message.text == '/start':
-        await state.finish()
         await send_welcome(message)
     else:
-        await state.finish()
         if message.text == allow_button.text:
             delete_questionnaire(message.from_user.id)
             await bot.send_message(message.from_user.id, f'{tdelet1}', reply_markup=recovery_questionnaire_keyboard)
@@ -26,6 +24,7 @@ async def delete_user_questionnaire(message: types.Message, state: FSMContext):
                 f'{tfind5}',
                 reply_markup=main_manu_buttons
             )
+    await state.finish()
 
 
 def register_user_handlers(dp: Dispatcher):

@@ -58,18 +58,24 @@ async def send_registered_user_count(message: types.Message):
         await bot.send_message(message.chat.id, f'Количество зарегистрированных пользователей {result.id}')
 
 
-async def stop_bot(message: types.Message, state: FSMContext):
+async def stop_bot(message: types.Message):
     if message.chat.id == admin_chat_id:
         await bot.delete_message(message.chat.id)
         await bot.send_message(message.chat.id, 'Бот остановлен !')
         print("Бот остановлен !")
         dispatcher.stop_polling()
         return quit()
-    await state.finish()
+
+
+# async def forward(message: types.Message):
+#     if message.chat.id == admin_chat_id:
+#         # await bot.send_message(message.chat.id, message.reply_to_message.message_id)
+#         await bot.forward_message(message.from_user.id, message.chat.id, message.reply_to_message.message_id)
 
 
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(announcement, commands=['announcement'])
     dp.register_message_handler(message_to_user, commands=['message'])
     dp.register_message_handler(send_registered_user_count, commands=['users'])
+    # dp.register_message_handler(forward, commands=['forward'])
     dp.register_message_handler(stop_bot, commands=['stop_bot'])

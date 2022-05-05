@@ -190,11 +190,10 @@ async def photo_edit(message: types.Message, state: FSMContext):
 
 
 async def about_edit(message: types.Message, state: FSMContext):
-    if message.content_type == ContentType.TEXT:
-        if message.text == '/start':
-            await state.finish()
-            await send_welcome(message)
-    elif message.content_type == ContentType.PHOTO:
+    if message.text == '/start':
+        await state.finish()
+        await send_welcome(message)
+    else:
         questionnaire = get_user_questionnaire(message.from_user.id)
         with Session(engine) as session:
             questionnaire.about = user_questionnaire_template(

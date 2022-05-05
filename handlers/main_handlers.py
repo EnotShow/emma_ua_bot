@@ -64,27 +64,33 @@ async def make_chose(message: types.Message, state: FSMContext):
         await FSMBan.status.set()
 
     else:
-        try:
-            # Знайомитись
-            if message.text == b1.text:
+        # Знайомитись
+        if message.text == b1.text:
+            try:
                 await FSMFind.user.set()
                 async with state.proxy() as data:
                     related_users = get_related_users(message.from_user.id)
-                    if len(related_users) == 1:
-                        related_users = related_users[0]
-                        user_questionnaire = related_users
+                    if not related_users:
+                        related_users = get_related_users(message.from_user.id, region_key=False)
+                    if related_users:
+                        if len(related_users) == 1:
+                            related_users = related_users[0]
+                            user_questionnaire = related_users
+                        else:
+                            user_questionnaire = random.choice(related_users)
+                            related_users.remove(user_questionnaire)
+                        data['userlist'] = related_users
+                        data['user'] = user_questionnaire.user_id
+                        await bot.send_photo(
+                            message.from_user.id,
+                            user_questionnaire.photo,
+                            caption=f'{user_questionnaire.about}',
+                            reply_markup=fbuttons)
                     else:
-                        user_questionnaire = random.choice(related_users)
-                        related_users.remove(user_questionnaire)
-                    data['userlist'] = related_users
-                    data['user'] = user_questionnaire.user_id
-                    await bot.send_photo(
-                        message.from_user.id,
-                        user_questionnaire.photo,
-                        caption=f'{user_questionnaire.about}',
-                        reply_markup=fbuttons)
-        except IndexError:
-            await bot.send_message(message.from_user.id, f'{tmain5}', reply_markup=main_manu_buttons)
+                        await state.finish()
+                        await bot.send_message(message.from_user.id, f'{tmain5}', reply_markup=main_manu_buttons)
+            except IndexError:
+                await bot.send_message(message.from_user.id, f'{tmain5}', reply_markup=main_manu_buttons)
 
     # Кому я сподобався
     if message.text == b2.text:

@@ -61,7 +61,7 @@ def get_related_users(user_id, region_key=True):
         to_find = questionnaire.find
         if region_key:
             stmt = select(Questionnaire).where(
-                # Questionnaire.user_id != user_id,
+                Questionnaire.user_id != user_id,
                 Questionnaire.sex == to_find,
                 Questionnaire.city == city,
                 Questionnaire.is_delete == False,
@@ -69,7 +69,7 @@ def get_related_users(user_id, region_key=True):
             )
         else:
             stmt = select(Questionnaire).where(
-                # Questionnaire.user_id != user_id,
+                Questionnaire.user_id != user_id,
                 Questionnaire.sex == to_find,
                 Questionnaire.city != city,
                 Questionnaire.is_delete == False,
@@ -77,7 +77,8 @@ def get_related_users(user_id, region_key=True):
             )
 
         related_users = engine.connect().execute(stmt).fetchall()
-        return related_users
+        if related_users:
+            return related_users
 
 
 def add_to_like_list(user_id, username, related_user_id, message=False):

@@ -50,6 +50,7 @@ def edit_questionnaire(user_id, username, name, age, photo_id, about, sex_id, ci
             questionnaire.city = city
             questionnaire.find = find_id
             questionnaire.is_delete = False
+        session.add(questionnaire)
         session.commit()
 
 
@@ -125,7 +126,7 @@ def give_user_who_like(current_user_id):
 
 def delete_questionnaire(user_id):
     session = DBSession()
-    user = get_user_questionnaire()
+    user = get_user_questionnaire(user_id)
     user.is_delete = True
     try:
         session.query(Likes).filter(Likes.questionnaire_user_id == user.user_id).delete(synchronize_session='evaluate')

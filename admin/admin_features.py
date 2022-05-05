@@ -1,6 +1,6 @@
 import re
-
 from aiogram import types, Dispatcher
+from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton
 from sqlalchemy import select
 
@@ -58,28 +58,18 @@ async def send_registered_user_count(message: types.Message):
         await bot.send_message(message.chat.id, f'Количество зарегистрированных пользователей {result.id}')
 
 
-async def stop_bot(message: types.Message):
+async def stop_bot(message: types.Message, state: FSMContext):
     if message.chat.id == admin_chat_id:
         await bot.delete_message(message.chat.id)
         await bot.send_message(message.chat.id, 'Бот остановлен !')
         print("Бот остановлен !")
         dispatcher.stop_polling()
         return quit()
-
-
-async def reload(message: types.Message):
-    if message.get_args() == int(message.get_args()):
-        button = InlineKeyboardButton('Перезапустити бота')
-
-
-# async def get_chat_id(message: types.Message):
-#     await bot.send_message(message.chat.id, f'{message.chat.id}')
+    await state.finish()
 
 
 def register_admin_handlers(dp: Dispatcher):
     dp.register_message_handler(announcement, commands=['announcement'])
     dp.register_message_handler(message_to_user, commands=['message'])
     dp.register_message_handler(send_registered_user_count, commands=['users'])
-    dp.register_message_handler(reload, commands=['reload'])
     dp.register_message_handler(stop_bot, commands=['stop_bot'])
-    # dp.register_message_handler(get_chat_id, commands=['chat'])

@@ -12,6 +12,9 @@ from aiogram.types import ReplyKeyboardRemove
 
 
 async def delete_user_questionnaire(message: types.Message, state: FSMContext):
+    """
+    Используется для удаления пользователя из списка выдачи
+    """
     if message.text == '/start':
         await send_welcome(message)
     else:

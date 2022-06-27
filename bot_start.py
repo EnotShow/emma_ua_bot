@@ -22,7 +22,6 @@ quistennaire_find_handler.register_user_handlers(dp)
 watch_like_list.register_user_handlers(dp)
 delete_questionnaire_handler.register_user_handlers(dp)
 inline_reply_handlers.register_admin_handlers(dp)
-test_handlers.register_user_handlers(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

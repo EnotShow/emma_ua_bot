@@ -6,7 +6,7 @@ from aiogram.types import ReplyKeyboardRemove
 import random
 
 from bot_create import bot
-from database import get_related_users, add_to_like_list, send_report, is_liked, return_to_main_manu
+from database import get_related_users, add_to_like_list, send_report, is_liked
 from handlers.main_handlers import send_welcome
 from language.ua.text import *
 from language.ua.keyboards import *
@@ -14,6 +14,9 @@ from states import FSMFind
 
 
 async def next_find_questionnaire(message: types.Message, state: FSMContext):
+    """
+    Получает случайную анкету из списка подходящих анкет
+    """
     if message.text == '/start':
         await state.finish()
         await send_welcome(message)
@@ -81,6 +84,9 @@ async def next_find_questionnaire(message: types.Message, state: FSMContext):
 
 
 async def get_message(message: types.Message, state: FSMContext):
+    """
+    Получает сообщение от пользователя, которое нужно доставить понравившемуся пользователю
+    """
     if message.text == '/start':
         await state.finish()
         await send_welcome(message)

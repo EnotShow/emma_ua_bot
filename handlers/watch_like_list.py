@@ -12,6 +12,9 @@ from states import FSMWatchList
 
 
 async def watch_next(message: types.Message, state: FSMContext):
+    """
+    Получает следующего пользователя из списка пользователуй, которым понравился пользователь
+    """
     if message.text == '/start':
         await state.finish()
         await send_welcome(message)

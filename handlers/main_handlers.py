@@ -14,6 +14,9 @@ from states import *
 
 
 async def send_welcome(message: types.Message):
+    """
+    Отправляет пользователю сообщение в случае команды /start
+    """
     try:
         is_register = is_registered(message.from_user.id)
         # Проверяет забаненый ли пользователь
@@ -49,15 +52,10 @@ async def send_welcome(message: types.Message):
     await message.delete()
 
 
-# async def some(message: types.Message):
-#     if message.text == 'some':
-#         await bot.send_message(message.from_user.id, 'some')
-
-
 async def make_chose(message: types.Message, state: FSMContext):
-    if not check_username(message.from_user.id):
-        await bot.send_message(message.from_user.id, f'{no_username}')
-
+    """
+    Каша из кода)))
+    """
     # Проверяет забаненый ли пользователь
     if is_banned(message.from_user.id):
         await bot.send_message(message.from_user.id, f'{tmain1}')
@@ -67,6 +65,9 @@ async def make_chose(message: types.Message, state: FSMContext):
         # Знайомитись
         if message.text == b1.text:
             try:
+                if not check_username(message.from_user.id):
+                    await bot.send_message(message.from_user.id, f'{no_username}')
+
                 await FSMFind.user.set()
                 async with state.proxy() as data:
                     related_users = get_related_users(message.from_user.id)

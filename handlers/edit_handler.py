@@ -15,6 +15,9 @@ from states import FSMEdit, FSMRegister, FSMPhotoEdit, FSMAboutEdit
 
 
 class QuestionnaireRegister:
+    """
+    Отвечает за регистрацию анкеты пользователя
+    """
 
     def __init__(self, FSM):
         self.FSM = FSM
@@ -166,6 +169,7 @@ user_edit = QuestionnaireEdit(FSM=FSMEdit)
 
 
 async def photo_edit(message: types.Message, state: FSMContext):
+    """Отвечает за изменение фото в анкете пользователя"""
     if message.content_type == ContentType.TEXT:
         if message.text == '/start':
             await state.finish()
@@ -190,6 +194,7 @@ async def photo_edit(message: types.Message, state: FSMContext):
 
 
 async def about_edit(message: types.Message, state: FSMContext):
+    """Отвечает за изменение информации о пользователи в анкете"""
     if message.text == '/start':
         await state.finish()
         await send_welcome(message)

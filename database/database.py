@@ -2,7 +2,6 @@ from sqlalchemy import create_engine, Column, ForeignKey, Integer, Boolean, Stri
 from sqlalchemy.orm import declarative_base, relationship, Session, sessionmaker
 import os
 
-
 engine = create_engine(f"sqlite:///sqlitedb")  # echo=True
 
 Base = declarative_base()
@@ -11,6 +10,9 @@ DBSession = sessionmaker(bind=engine)
 
 
 class Questionnaire(Base):
+    """
+    Отвечает за хранения данных пользовательской анкеты и пользователя
+    """
     __tablename__ = 'questionnaire'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -31,6 +33,9 @@ class Questionnaire(Base):
 
 
 class Likes(Base):
+    """
+    Отвечает за хранение анкет, которые понравились пользователю
+    """
     __tablename__ = 'likes'
 
     id = Column(Integer, autoincrement=True, primary_key=True)
@@ -42,4 +47,7 @@ class Likes(Base):
 
 
 def create_db():
+    """
+    Создает базу данных
+    """
     Base.metadata.create_all(engine)

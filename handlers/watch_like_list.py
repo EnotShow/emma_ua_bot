@@ -5,7 +5,7 @@ from sqlalchemy import select
 from bot_create import bot
 from database import give_user_who_like
 from database.database import Questionnaire, engine
-from handlers.main_handlers import send_welcome
+from handlers.welcome_handlers import send_welcome
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import FSMWatchList

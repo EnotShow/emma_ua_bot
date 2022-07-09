@@ -21,7 +21,7 @@ def get_user_questionnaire(user_id):
     return questionnaire
 
 
-def register_questionnaire(user_id, username, name, age, photo_id, about, sex_id, city, find_id):
+def register_questionnaire(user_id, username, name, country, age, photo_id, about, sex_id, city, find_id):
     """
     Отвечает за добавление анкеты пользователя в базу данных
     """
@@ -30,6 +30,7 @@ def register_questionnaire(user_id, username, name, age, photo_id, about, sex_id
             user_id=user_id,
             username=username,
             name=name,
+            country=country,
             age=age,
             photo=photo_id,
             about=about,
@@ -43,7 +44,7 @@ def register_questionnaire(user_id, username, name, age, photo_id, about, sex_id
     session.commit()
 
 
-def edit_questionnaire(user_id, username, name, age, photo_id, about, sex_id, city, find_id):
+def edit_questionnaire(user_id, username, name, country, age, photo_id, about, sex_id, city, find_id):
     """
     Отвечает за редактирование уже существующей анкеты
     """
@@ -54,6 +55,7 @@ def edit_questionnaire(user_id, username, name, age, photo_id, about, sex_id, ci
             questionnaire.photo = photo_id
             questionnaire.about = about
             questionnaire.name = name
+            questionnaire.country = country
             questionnaire.age = age
             questionnaire.sex = sex_id
             questionnaire.city = city
@@ -63,11 +65,12 @@ def edit_questionnaire(user_id, username, name, age, photo_id, about, sex_id, ci
         session.commit()
 
 
-def get_related_users(user_id, region_key=True):
+def get_related_users(user_id, region_key=True, country_key=True):
     """
     Получает список анкет для выдачи
     """
     questionnaire = get_user_questionnaire(user_id)
+    country = questionnaire.country
     city = questionnaire.city
     to_find = questionnaire.find
     if region_key:
@@ -75,6 +78,15 @@ def get_related_users(user_id, region_key=True):
             Questionnaire.user_id != user_id,
             Questionnaire.sex == to_find,
             Questionnaire.city == city,
+            Questionnaire.country == country,
+            Questionnaire.is_delete == False,
+            Questionnaire.is_banned == False
+        )
+    elif not region_key and not country_key:
+        stmt = select(Questionnaire).where(
+            Questionnaire.user_id != user_id,
+            Questionnaire.sex == to_find,
+            Questionnaire.country != country,
             Questionnaire.is_delete == False,
             Questionnaire.is_banned == False
         )
@@ -82,6 +94,7 @@ def get_related_users(user_id, region_key=True):
         stmt = select(Questionnaire).where(
             Questionnaire.user_id != user_id,
             Questionnaire.sex == to_find,
+            Questionnaire.country == country,
             Questionnaire.city != city,
             Questionnaire.is_delete == False,
             Questionnaire.is_banned == False
@@ -146,7 +159,6 @@ def give_user_who_like(current_user_id):
 
 
 def delete_questionnaire(user_id):
-    # TODO
     """
     Устанавливает флаг is_delete == True для текущего пользователя
     """

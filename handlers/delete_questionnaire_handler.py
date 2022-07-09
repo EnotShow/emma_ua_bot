@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 
-from handlers.main_handlers import send_welcome
+from handlers.welcome_handlers import send_welcome
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import FSMDelete

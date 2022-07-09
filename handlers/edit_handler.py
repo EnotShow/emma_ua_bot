@@ -8,7 +8,7 @@ from bot_create import bot
 from database import edit_questionnaire, user_questionnaire_template, city_filter, get_user_questionnaire, \
     register_questionnaire
 from database.database import engine
-from handlers.main_handlers import send_welcome
+from handlers.welcome_handlers import send_welcome
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import FSMEdit, FSMRegister, FSMPhotoEdit, FSMAboutEdit
@@ -18,10 +18,10 @@ class QuestionnaireRegister:
     """
     Отвечает за регистрацию анкеты пользователя
     """
-
     def __init__(self, FSM):
         self.FSM = FSM
 
+    """Получает данные о возрасте пользователя"""
     async def get_age(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
             await state.finish()
@@ -35,6 +35,8 @@ class QuestionnaireRegister:
                 await bot.send_message(message.from_user.id, f'{tedit1}', reply_markup=sexb1)
             except:
                 await bot.send_message(message.from_user.id, f'{tedit2}')
+
+    """Получает стать пользователя"""
 
     async def get_sex(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
@@ -51,6 +53,8 @@ class QuestionnaireRegister:
                 await bot.send_message(message.from_user.id, f'{tedit3}',
                                        reply_markup=ReplyKeyboardRemove())
 
+    """Получает имя пользователя"""
+
     async def get_name(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
             await state.finish()
@@ -59,7 +63,21 @@ class QuestionnaireRegister:
             async with state.proxy() as data:
                 data['name'] = message.text
             await self.FSM.next()
+            await bot.send_message(message.from_user.id, f'{tedit14}')
+
+    """Получает страну пользователя"""
+
+    async def get_country(self, message: types.Message, state: FSMContext):
+        if message.text == '/start':
+            await state.finish()
+            await send_welcome(message)
+        else:
+            async with state.proxy() as data:
+                data['country'] = message.text
+            await self.FSM.next()
             await bot.send_message(message.from_user.id, f'{tedit4}', reply_markup=cityb)
+
+    """Получает город пользователя"""
 
     async def get_city(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
@@ -73,6 +91,8 @@ class QuestionnaireRegister:
                 await bot.send_message(message.from_user.id, f'{tedit5}', reply_markup=sexb2)
             else:
                 await bot.send_message(message.from_user.id, f'{tedit6}')
+
+    """Получает пол пользователей, которых хочет искать пользователь"""
 
     async def get_find(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
@@ -92,6 +112,8 @@ class QuestionnaireRegister:
                     reply_markup=ReplyKeyboardRemove()
                 )
 
+    """Получает данные о поле 'О себе'"""
+
     async def get_about(self, message: types.Message, state: FSMContext):
         if message.text == '/start':
             await state.finish()
@@ -101,6 +123,8 @@ class QuestionnaireRegister:
                 data['about'] = message.text
             await self.FSM.next()
             await bot.send_message(message.from_user.id, f'{tedit8}')
+
+    """Получает фото пользователя и сохраняет все полученные данные в базу данных"""
 
     async def get_photo(self, message: types.Message, state: FSMContext):
         if message.content_type == ContentType.TEXT:
@@ -116,6 +140,7 @@ class QuestionnaireRegister:
                     user_id=message.from_user.id,
                     username=message.from_user.username,
                     name=data['name'],
+                    country=data['country'],
                     age=data['age'],
                     photo_id=data['photo'],
                     about=user_questionnaire_template(data["age"], data["name"], data["city"], data["about"]),
@@ -133,6 +158,7 @@ class QuestionnaireRegister:
 
 
 class QuestionnaireEdit(QuestionnaireRegister):
+    """Редактирования анкеты пользователя"""
 
     async def get_photo(self, message: types.Message, state: FSMContext):
         if message.content_type == ContentType.TEXT:
@@ -148,6 +174,7 @@ class QuestionnaireEdit(QuestionnaireRegister):
                     user_id=message.from_user.id,
                     username=message.from_user.username,
                     name=data['name'],
+                    country=data['country'],
                     age=data['age'],
                     photo_id=data['photo'],
                     about=user_questionnaire_template(data["age"], data["name"], data["city"], data["about"]),
@@ -225,6 +252,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(user_register.get_age, state=FSMRegister.age)
     dp.register_message_handler(user_register.get_sex, state=FSMRegister.sex)
     dp.register_message_handler(user_register.get_name, state=FSMRegister.name)
+    dp.register_message_handler(user_register.get_country, state=FSMRegister.country)
     dp.register_message_handler(user_register.get_city, state=FSMRegister.city)
     dp.register_message_handler(user_register.get_find, state=FSMRegister.find)
     dp.register_message_handler(user_register.get_about, state=FSMRegister.about)
@@ -234,6 +262,7 @@ def register_user_handlers(dp: Dispatcher):
     dp.register_message_handler(user_edit.get_age, state=FSMEdit.age)
     dp.register_message_handler(user_edit.get_sex, state=FSMEdit.sex)
     dp.register_message_handler(user_edit.get_name, state=FSMEdit.name)
+    dp.register_message_handler(user_edit.get_country, state=FSMEdit.country)
     dp.register_message_handler(user_edit.get_city, state=FSMEdit.city)
     dp.register_message_handler(user_edit.get_find, state=FSMEdit.find)
     dp.register_message_handler(user_edit.get_about, state=FSMEdit.about)

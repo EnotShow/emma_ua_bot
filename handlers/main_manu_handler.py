@@ -1,5 +1,3 @@
-import random
-
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
@@ -8,48 +6,10 @@ from sqlalchemy.orm import Session
 from bot_create import bot
 from database import *
 from database.database import engine
+from handlers.quistennaire_find_handler import start_not_international_search
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import *
-
-
-async def send_welcome(message: types.Message):
-    """
-    Отправляет пользователю сообщение в случае команды /start
-    """
-    try:
-        is_register = is_registered(message.from_user.id)
-        # Проверяет забаненый ли пользователь
-        if is_banned(message.from_user.id):
-            await bot.send_message(
-                message.from_user.id,
-                f'{tmain1}',
-                reply_markup=ReplyKeyboardRemove()
-            )
-            await FSMBan.status.set()
-        else:
-            # Если пользовтель удалил свою анкету
-            if is_register.is_delete:
-                await bot.send_message(
-                    message.from_user.id,
-                    f'{tmain2}',
-                    reply_markup=recovery_questionnaire_keyboard
-                )
-            # Пользователь зарегистрирован
-            elif not is_register.is_delete:
-                await bot.send_message(
-                    message.from_user.id,
-                    f'{tmain3}',
-                    reply_markup=main_manu_buttons
-                )
-    except:
-        # У пользователя нет анкеты
-        await FSMRegister.age.set()
-        await bot.send_message(
-            message.from_user.id,
-            f'{tmain8}',
-        )
-    await message.delete()
 
 
 async def make_chose(message: types.Message, state: FSMContext):
@@ -64,34 +24,7 @@ async def make_chose(message: types.Message, state: FSMContext):
     else:
         # Знайомитись
         if message.text == b1.text:
-            try:
-                if not check_username(message.from_user.id):
-                    await bot.send_message(message.from_user.id, f'{no_username}')
-
-                await FSMFind.user.set()
-                async with state.proxy() as data:
-                    related_users = get_related_users(message.from_user.id)
-                    if not related_users:
-                        related_users = get_related_users(message.from_user.id, region_key=False)
-                    if related_users:
-                        if len(related_users) == 1:
-                            related_users = related_users[0]
-                            user_questionnaire = related_users
-                        else:
-                            user_questionnaire = random.choice(related_users)
-                            related_users.remove(user_questionnaire)
-                        data['userlist'] = related_users
-                        data['user'] = user_questionnaire.user_id
-                        await bot.send_photo(
-                            message.from_user.id,
-                            user_questionnaire.photo,
-                            caption=f'{user_questionnaire.about}',
-                            reply_markup=fbuttons)
-                    else:
-                        await state.finish()
-                        await bot.send_message(message.from_user.id, f'{tmain5}', reply_markup=main_manu_buttons)
-            except IndexError:
-                await bot.send_message(message.from_user.id, f'{tmain5}', reply_markup=main_manu_buttons)
+            await start_not_international_search(message, state)
 
     # Кому я сподобався
     if message.text == b2.text:
@@ -114,7 +47,7 @@ async def make_chose(message: types.Message, state: FSMContext):
                         message.from_user.id,
                         questionnaire.photo,
                         caption=f'{questionnaire.about}'
-                                f'{tedit6}\n{user_message}',
+                                f'{tmain6}\n{user_message}',
                         reply_markup=wlbutton
                     )
         except:
@@ -150,7 +83,7 @@ async def make_chose(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, f'{tfind5}', reply_markup=main_manu_buttons)
     if message.text == editb3.text:
         await FSMEdit.age.set()
-        await bot.send_message(message.from_user.id, f'{tmain4}')
+        await bot.send_message(message.from_user.id, f'{tmain4}', reply_markup=ReplyKeyboardRemove())
     elif message.text == editb4.text:
         await FSMPhotoEdit.photo.set()
         await bot.send_message(message.from_user.id, f'{tedit10}', reply_markup=ReplyKeyboardRemove())
@@ -170,11 +103,5 @@ async def make_chose(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, f'{tdelet2}', reply_markup=ReplyKeyboardRemove())
 
 
-async def ban(message: types.Message):
-    await bot.send_message(message.from_user.id, f'{tmain1}')
-
-
 def register_user_handlers(dp: Dispatcher):
-    dp.register_message_handler(send_welcome, commands=['start'])
     dp.register_message_handler(make_chose)
-    dp.register_message_handler(ban, state=FSMBan.status)

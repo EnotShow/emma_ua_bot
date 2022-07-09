@@ -23,7 +23,7 @@ class Questionnaire(Base):
     photo = Column(String(100))
     about = Column(String(500))
     sex = Column(Integer)
-    country = (Column(String(20), default='Польша'))
+    country = Column(String(20))
     city = Column(String(30))
     find = Column(Integer)
     is_delete = Column(Boolean, default=False)

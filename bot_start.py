@@ -16,7 +16,8 @@ async def on_startup(_):
 from handlers import *
 
 admin_features.register_admin_handlers(dp)
-main_handlers.register_user_handlers(dp)
+welcome_handlers.register_user_handlers(dp)
+main_manu_handler.register_user_handlers(dp)
 edit_handler.register_user_handlers(dp)
 quistennaire_find_handler.register_user_handlers(dp)
 watch_like_list.register_user_handlers(dp)

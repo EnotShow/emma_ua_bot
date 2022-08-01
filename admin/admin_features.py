@@ -1,7 +1,7 @@
 import re
 
 from aiogram import types, Dispatcher
-from sqlalchemy import select
+from sqlalchemy import select, desc
 from sqlalchemy.orm import Session
 
 from admin import admin_chat_id
@@ -67,8 +67,8 @@ async def announcement(message: types.Message):
 
 async def send_registered_user_count(message: types.Message):
     if message.chat.id == admin_chat_id:
-        stmt = select(Questionnaire).where(-Questionnaire.id)
-        result = engine.connect().execute(stmt).fetchall()[-1]
+        stmt = select(Questionnaire).order_by(desc(Questionnaire.id))
+        result = engine.connect().execute(stmt).fetchone()
         await bot.send_message(message.chat.id, f'Количество зарегистрированных пользователей {result.id}')
 
 

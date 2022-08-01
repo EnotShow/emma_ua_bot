@@ -14,7 +14,7 @@ from states import *
 
 async def make_chose(message: types.Message, state: FSMContext):
     """
-    Каша из кода)))
+    Варианты ответа в главном меню
     """
     # Проверяет забаненый ли пользователь
     if is_banned(message.from_user.id):
@@ -68,7 +68,7 @@ async def make_chose(message: types.Message, state: FSMContext):
             f'{tmain9}',
             reply_markup=confirmation_button
         )
-    # -------------------------
+    # Переглянути мою анкету
     if message.text == editb1.text:
         questionnaire = get_user_questionnaire(message.from_user.id)
         await bot.send_photo(
@@ -77,27 +77,33 @@ async def make_chose(message: types.Message, state: FSMContext):
             caption=f'{questionnaire.about}',
             reply_markup=main_manu_buttons
         )
+    # Редагувати мою анкету
     if message.text == editb2.text:
         await bot.send_message(message.from_user.id, f'{tfind5}', reply_markup=editk2)
+    # Головне меню
     if message.text == mainb.text:
         await bot.send_message(message.from_user.id, f'{tfind5}', reply_markup=main_manu_buttons)
+    # Заповнити анкету заново
     if message.text == editb3.text:
         await FSMEdit.age.set()
         await bot.send_message(message.from_user.id, f'{tmain4}', reply_markup=ReplyKeyboardRemove())
-    elif message.text == editb4.text:
+    # Змінити фото
+    if message.text == editb4.text:
         await FSMPhotoEdit.photo.set()
         await bot.send_message(message.from_user.id, f'{tedit10}', reply_markup=ReplyKeyboardRemove())
-    elif message.text == editb5.text:
+    # Про себе
+    if message.text == editb5.text:
         await FSMAboutEdit.about.set()
         await bot.send_message(message.from_user.id, f'{tedit11}')
-    elif message.text == editb6.text:
+    # Змінити нікнейм
+    if message.text == editb6.text:
         questionnaire = get_user_questionnaire(message.from_user.id)
         with Session(engine) as session:
             questionnaire.username = message.from_user.username
             session.add(questionnaire)
             session.commit()
         await bot.send_message(message.from_user.id, f'{tedit12}', reply_markup=main_manu_buttons)
-    # recover
+    # Відновити анкету
     if message.text == recoverb.text:
         await FSMEdit.age.set()
         await bot.send_message(message.from_user.id, f'{tdelet2}', reply_markup=ReplyKeyboardRemove())

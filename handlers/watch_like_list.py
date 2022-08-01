@@ -5,6 +5,7 @@ from sqlalchemy import select
 from bot_create import bot
 from database import give_user_who_like
 from database.database import Questionnaire, engine
+from database.responses import check_country
 from handlers.welcome_handlers import send_welcome
 from language.ua.keyboards import *
 from language.ua.text import *
@@ -33,7 +34,12 @@ async def watch_next(message: types.Message, state: FSMContext):
                             data['user_id'],
                             result.photo,
                             caption=f"{tlike1}{result.about}.\n\n{tlike2}{current_user_username}")
+                        if check_country(data['user_id']) == 'Україна':
+                            await bot.send_message(data['user_id'], warning)
+
                         await bot.send_message(message.from_user.id, f'{tlike3}{data["username"]}.{tlike4}')
+                        if check_country(message.from_user.id) == 'Україна':
+                            await bot.send_message(message.from_user.id, warning)
                     except:
                         await bot.send_message(message.from_user.id, f'{tfind6}')
 

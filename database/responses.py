@@ -235,10 +235,17 @@ def check_username(user):
         return False
 
 
-def city_filter(message_text):
-    """
-    Проверяет есть ли город пользователя в списке поддерживаймых городов
-    """
-    for i in city_list:
-        if i == message_text:
-            return True
+def check_country(user_id):
+    """ Смотрит страну пользователя """
+    user = get_user_questionnaire(user_id)
+    print(user.country)
+    return user.country
+
+
+# def city_filter(message_text):
+#     """
+#     Проверяет есть ли город пользователя в списке поддерживаймых городов
+#     """
+#     for i in city_list:
+#         if i == message_text:
+#             return True

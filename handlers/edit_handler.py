@@ -4,11 +4,13 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 from sqlalchemy.orm import Session
 
+from admin.config import banned_countries
 from bot_create import bot
-from database import edit_questionnaire, user_questionnaire_template, city_filter, get_user_questionnaire, \
+from database import edit_questionnaire, user_questionnaire_template, get_user_questionnaire, \
     register_questionnaire
 from database.database import engine
 from handlers.welcome_handlers import send_welcome
+from keyboards.countries_keyboards import return_city_list, country_buttons
 from language.ua.keyboards import *
 from language.ua.text import *
 from states import FSMEdit, FSMRegister, FSMPhotoEdit, FSMAboutEdit
@@ -63,7 +65,7 @@ class QuestionnaireRegister:
             async with state.proxy() as data:
                 data['name'] = message.text
             await self.FSM.next()
-            await bot.send_message(message.from_user.id, f'{tedit14}')
+            await bot.send_message(message.from_user.id, f'{tedit14}', reply_markup=country_buttons)
 
     """Получает страну пользователя"""
 
@@ -72,10 +74,19 @@ class QuestionnaireRegister:
             await state.finish()
             await send_welcome(message)
         else:
+            if message.text.upper() in banned_countries:
+                await bot.send_message(message.from_user.id, tedit6, reply_markup=ReplyKeyboardRemove())
             async with state.proxy() as data:
                 data['country'] = message.text
             await self.FSM.next()
-            await bot.send_message(message.from_user.id, f'{tedit4}', reply_markup=cityb)
+            city_list = return_city_list(message.text)
+            if city_list:
+                city_buttons = ReplyKeyboardMarkup(resize_keyboard=True)
+                for i in city_list:
+                    city_buttons.insert(KeyboardButton(i))
+                await bot.send_message(message.from_user.id, f'{tedit4}', reply_markup=city_buttons)
+            else:
+                await bot.send_message(message.from_user.id, f'{tedit4}', reply_markup=ReplyKeyboardRemove())
 
     """Получает город пользователя"""
 
@@ -84,13 +95,10 @@ class QuestionnaireRegister:
             await state.finish()
             await send_welcome(message)
         else:
-            if city_filter(message.text):
-                async with state.proxy() as data:
-                    data['city'] = message.text
-                await self.FSM.next()
-                await bot.send_message(message.from_user.id, f'{tedit5}', reply_markup=sexb2)
-            else:
-                await bot.send_message(message.from_user.id, f'{tedit6}')
+            async with state.proxy() as data:
+                data['city'] = message.text
+            await self.FSM.next()
+            await bot.send_message(message.from_user.id, f'{tedit5}', reply_markup=sexb2)
 
     """Получает пол пользователей, которых хочет искать пользователь"""
 
@@ -143,7 +151,7 @@ class QuestionnaireRegister:
                     country=data['country'],
                     age=data['age'],
                     photo_id=data['photo'],
-                    about=user_questionnaire_template(data["age"], data["name"], data["city"], data["about"]),
+                    about=user_questionnaire_template(data["age"], data["name"], data['country'], data["city"], data["about"]),
                     sex_id=data['sex'],
                     city=data['city'],
                     find_id=data['find']
@@ -152,7 +160,7 @@ class QuestionnaireRegister:
                     message.from_user.id,
                     data['photo'],
                     caption=f'{tedit9}'
-                            f'{user_questionnaire_template(data["age"], data["name"], data["city"], data["about"])}',
+                            f'{user_questionnaire_template(data["age"], data["name"], data["country"], data["city"], data["about"])}',
                     reply_markup=main_manu_buttons)
                 await state.finish()
 
@@ -177,7 +185,7 @@ class QuestionnaireEdit(QuestionnaireRegister):
                     country=data['country'],
                     age=data['age'],
                     photo_id=data['photo'],
-                    about=user_questionnaire_template(data["age"], data["name"], data["city"], data["about"]),
+                    about=user_questionnaire_template(data["age"], data["name"], data['country'], data["city"], data["about"]),
                     sex_id=data['sex'],
                     city=data['city'],
                     find_id=data['find']
@@ -186,7 +194,7 @@ class QuestionnaireEdit(QuestionnaireRegister):
                     message.from_user.id,
                     data['photo'],
                     caption=f'{tedit9}'
-                            f'{user_questionnaire_template(data["age"], data["name"], data["city"], data["about"])}',
+                            f'{user_questionnaire_template(data["age"], data["name"], data["country"], data["city"], data["about"])}',
                     reply_markup=main_manu_buttons)
                 await state.finish()
 
@@ -215,7 +223,7 @@ async def photo_edit(message: types.Message, state: FSMContext):
             message.from_user.id,
             questionnaire.photo,
             caption=f'{tedit9}'
-                    f'{user_questionnaire_template(questionnaire.age, questionnaire.name, questionnaire.city, questionnaire.about)}',
+                    f'{user_questionnaire_template(questionnaire.age, questionnaire.name, questionnaire.country, questionnaire.city, questionnaire.about)}',
             reply_markup=main_manu_buttons)
         await state.finish()
 
@@ -231,6 +239,7 @@ async def about_edit(message: types.Message, state: FSMContext):
             questionnaire.about = user_questionnaire_template(
                 questionnaire.age,
                 questionnaire.name,
+                questionnaire.country,
                 questionnaire.city,
                 message.text
             )
@@ -242,7 +251,7 @@ async def about_edit(message: types.Message, state: FSMContext):
             message.from_user.id,
             questionnaire.photo,
             caption=f'{tedit9}'
-                    f'{user_questionnaire_template(questionnaire.age, questionnaire.name, questionnaire.city, questionnaire.about)}',
+                    f'{user_questionnaire_template(questionnaire.age, questionnaire.name, questionnaire.country, questionnaire.city, questionnaire.about)}',
             reply_markup=main_manu_buttons)
         await state.finish()
 

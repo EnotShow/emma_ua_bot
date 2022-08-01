@@ -23,23 +23,6 @@ fb2 = KeyboardButton('Дівчата')
 sexb2 = ReplyKeyboardMarkup(resize_keyboard=True)
 sexb2.add(mb2).insert(fb2)
 
-# city select buttons
-
-city1 = KeyboardButton('Варшава')
-city2 = KeyboardButton('Краків')
-city3 = KeyboardButton('Лодзь')
-city4 = KeyboardButton('Вроцлав')
-city5 = KeyboardButton('Познань')
-city6 = KeyboardButton('Гданьськ')
-city7 = KeyboardButton('Щецин')
-city8 = KeyboardButton('Бидгощ')
-city9 = KeyboardButton('Люблин')
-city10 = KeyboardButton('Катовіце')
-city_list = ['Варшава', 'Краків', 'Лодзь', 'Вроцлав', 'Познань', 'Гданьськ', 'Щецин', 'Бидгощ', 'Люблин', 'Катовіце']
-
-cityb = ReplyKeyboardMarkup(resize_keyboard=True)
-cityb.add(city1).row(city2, city3, city4).row(city5, city6, city7).row(city8, city9, city10)
-
 # select questionnaire buttons
 
 like = KeyboardButton('💙')

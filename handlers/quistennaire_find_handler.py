@@ -97,7 +97,6 @@ class QuestionnaireFind:
                             await send_report(data["user"], message.from_user.username)
                     related_users = data['userlist']
                     if related_users:
-                        print(len(related_users))
                         if len(related_users) == 1:
                             related_users = related_users[0]
                             user_questionnaire = related_users
@@ -145,7 +144,6 @@ class QuestionnaireFind:
                     )
                 related_users = data['userlist']
                 if related_users:
-                    print(len(related_users))
                     if len(related_users) == 1:
                         related_users = related_users[0]
                         user_questionnaire = related_users
